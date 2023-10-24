@@ -71,7 +71,33 @@ public class DivByZeroTransfer extends CFTransfer {
             Comparison operator,
             AnnotationMirror lhs,
             AnnotationMirror rhs) {
-        // TODO
+        if (operator.equals(Comparison.EQ)) {
+            return rhs;
+        }
+        if (operator.equals(Comparison.NE)) {
+            // right is not zero, so left is
+            if (equal(rhs, reflect(NonZero.class))) {
+                return reflect(Zero.class);
+            } 
+            // right is zero, so left isn't
+            if (equal(rhs, reflect(Zero.class))) {
+                return reflect(NonZero.class);
+            }
+        }
+        if (operator.equals(Comparison.LT)) {
+            // right is zero, so left is less than
+            if (equal(rhs, reflect(Zero.class))) {
+                return reflect(NonZero.class);
+            }
+        }
+        if (operator.equals(Comparison.GT)) {
+            // right is zero, so left is greater than 
+            if (equal(rhs, reflect(Zero.class))) {
+                return reflect(NonZero.class);
+            }
+        }
+        // can't be more specific with >= or <= 
+        // -- knowing anything about the right tells us nothing about the left
         return lhs;
     }
 
@@ -93,7 +119,86 @@ public class DivByZeroTransfer extends CFTransfer {
             BinaryOperator operator,
             AnnotationMirror lhs,
             AnnotationMirror rhs) {
-        // TODO
+        if (operator.equals(BinaryOperator.PLUS)) {
+            // both are zero
+            if (equal(lhs, reflect(Zero.class)) && equal(rhs, reflect(Zero.class))) {
+                return reflect(Zero.class);
+            }
+            // left is zero, right is nonzero
+            if (equal(lhs, reflect(Zero.class))) {
+                return rhs;
+            }
+            // left is non-zero, right is zero
+            if (equal(rhs, reflect(Zero.class))) {
+                return lhs;
+            }
+            // else, both non-zero
+            return reflect(Top.class);
+        }
+        if (operator.equals(BinaryOperator.MINUS)) {
+            // both are zero
+            if (equal(lhs, reflect(Zero.class)) && equal(rhs, reflect(Zero.class))) {
+                return reflect(Zero.class);
+            }
+            // left is zero, right is nonzero
+            if (equal(lhs, reflect(Zero.class))) {
+                return rhs;
+            }
+            // left is non-zero, right is zero
+            if (equal(rhs, reflect(Zero.class))) {
+                return lhs;
+            }
+            // else, both non-zero
+            return reflect(Top.class);
+        }
+        if (operator.equals(BinaryOperator.TIMES)) {
+            // both are zero
+            if (equal(lhs, reflect(Zero.class)) && equal(rhs, reflect(Zero.class))) {
+                return reflect(Zero.class);
+            }
+            // left is zero, right is nonzero
+            if (equal(lhs, reflect(Zero.class))) {
+                return reflect(Zero.class);
+            }
+            // left is non-zero, right is zero
+            if (equal(rhs, reflect(Zero.class))) {
+                return reflect(Zero.class);
+            }
+            // else, both non-zero
+            return reflect(NonZero.class);
+        }
+        if (operator.equals(BinaryOperator.DIVIDE)) {
+            // both are zero
+            if (equal(lhs, reflect(Zero.class)) && equal(rhs, reflect(Zero.class))) {
+                return reflect(Top.class);
+            }
+            // left is zero, right is nonzero
+            if (equal(lhs, reflect(Zero.class))) {
+                return reflect(Zero.class);
+            }
+            // left is non-zero, right is zero
+            if (equal(rhs, reflect(Zero.class))) {
+                return reflect(Top.class);
+            }
+            // else, both non-zero
+            return reflect(NonZero.class);
+        }
+        if (operator.equals(BinaryOperator.MOD)) {
+            // both are zero
+            if (equal(lhs, reflect(Zero.class)) && equal(rhs, reflect(Zero.class))) {
+                return reflect(Top.class);
+            }
+            // left is zero, right is nonzero
+            if (equal(lhs, reflect(Zero.class))) {
+                return reflect(Zero.class);
+            }
+            // left is non-zero, right is zero
+            if (equal(rhs, reflect(Zero.class))) {
+                return reflect(Top.class);
+            }
+            // else, both non-zero
+            return reflect(NonZero.class);
+        }
         return top();
     }
 
